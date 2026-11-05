@@ -7,6 +7,7 @@ export function makeHandler({ env = process.env, fetcher = fetch, clientFactory 
   res.setHeader('Cache-Control','no-store, max-age=0');
   res.setHeader('Pragma','no-cache');
   res.setHeader('X-Content-Type-Options','nosniff');
+  if((env.VITE_APP_MODE||'public')!=='public') return res.status(404).json({error:'NOT_FOUND'});
   if(req.method!=='POST') {res.setHeader('Allow','POST');return res.status(405).json({error:'METHOD'});}
   const required=['APP_ORIGIN','SUPABASE_URL','SUPABASE_SERVICE_ROLE_KEY','TURNSTILE_SECRET_KEY','TURNSTILE_HOSTNAME','RATE_LIMIT_SECRET'];
   if(required.some(k=>!env[k]) || env.RATE_LIMIT_SECRET.length<32) return res.status(503).json({error:'UNAVAILABLE'});

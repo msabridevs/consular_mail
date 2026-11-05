@@ -1,5 +1,11 @@
 # Design and official references
 
+## Separate deployments
+
+The same Git repository is connected to two independent Vercel projects. VITE_APP_MODE=public (default) builds src/main.jsx → public.jsx; VITE_APP_MODE=staff builds src/staff-main.jsx → staff.jsx. The HTML entry is selected before Vite processing. No employee client or Supabase browser SDK is imported into the public graph. No Turnstile widget or tracking form is imported into the staff graph. Shared shell contains only branding and the language switch, with no cross-site links.
+
+Legacy /staff paths redirect to / on the same host. On the public host this can only show the public page. The staff deployment refuses /api/track with 404 before external calls. Staff host requires only VITE_APP_MODE and the two public Supabase variables. All service/Turnstile secrets belong only to the public project. A separate URL is not a network access policy; login screen discoverability is distinct from authenticated data access.
+
 ## Data path
 
 Public browser → POST /api/track on Vercel → persistent HMAC-IP rate limit → Turnstile server validation (including hostname and action) → service-only lookup_public RPC → explicitly allowlisted result.
@@ -45,3 +51,6 @@ Dates in dashboard use Europe/Berlin. The overdue threshold is 7 calendar days f
 - Turnstile server validation: https://developers.cloudflare.com/turnstile/get-started/server-side-validation/
 
 Provider interfaces, available plans and quotas can change. Use the linked official documentation for account-level settings. No pricing or institutional compliance certification is asserted by this repository.
+
+Vercel multiple projects per repository: https://vercel.com/docs/projects
+Vite HTML entry transformation: https://vite.dev/guide/api-plugin
